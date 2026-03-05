@@ -1,0 +1,32 @@
+.navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px 60px;
+  background:#0f172a;
+  color:white;
+}
+
+.logo{
+  font-size:26px;
+  font-weight:bold;
+}
+
+.nav-buttons button{
+  margin-left:15px;
+  padding:10px 20px;
+  border:none;
+  cursor:pointer;
+  font-size:15px;
+  border-radius:6px;
+}
+
+.login-btn{
+  background:white;
+  color:black;
+}
+
+.signup-btn{
+  background:#3b82f6;
+  color:white;
+}
