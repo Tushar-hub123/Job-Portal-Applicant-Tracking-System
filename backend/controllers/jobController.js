@@ -12,7 +12,7 @@ exports.createJob = async (req,res)=>{
       location,
       description,
       skills,
-      education,
+      qualification,
       experience
     } = req.body;
 
@@ -23,7 +23,7 @@ exports.createJob = async (req,res)=>{
       location,
       description,
       skills,
-      education,
+      qualification,
       experience,
       recruiter:req.user.id
 

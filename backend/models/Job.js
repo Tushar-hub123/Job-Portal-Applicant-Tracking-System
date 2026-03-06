@@ -26,7 +26,7 @@ const jobSchema = new mongoose.Schema({
     type:String
   },
 
-  education:{
+  qualification:{
     type:String
   },
 

@@ -12,7 +12,7 @@ function RecruiterDashboard() {
   const [location,setLocation] = useState("");
   const [description,setDescription] = useState("");
   const [skills,setSkills] = useState("");
-  const [education,setEducation] = useState("");
+  const [qualification,setQualification] = useState("");
   const [experience,setExperience] = useState("");
 
   const token = localStorage.getItem("token");
@@ -51,7 +51,7 @@ function RecruiterDashboard() {
           location,
           description,
           skills,
-          education,
+          qualification,
           experience
         },
         {
@@ -66,7 +66,7 @@ function RecruiterDashboard() {
       setLocation("");
       setDescription("");
       setSkills("");
-      setEducation("");
+      setQualification("");
       setExperience("");
 
       fetchJobs();
@@ -180,9 +180,9 @@ function RecruiterDashboard() {
           style={styles.input}
           />
 
-          <input type="text" placeholder="Education Required"
-          value={education}
-          onChange={(e)=>setEducation(e.target.value)}
+          <input type="text" placeholder="Qualification Required"
+          value={qualification}
+          onChange={(e)=>setQualification(e.target.value)}
           style={styles.input}
           />
 
@@ -213,7 +213,7 @@ function RecruiterDashboard() {
           <p><b>Company:</b> {job.company}</p>
           <p><b>Location:</b> {job.location}</p>
           <p><b>Skills:</b> {job.skills}</p>
-          <p><b>Education:</b> {job.education}</p>
+          <p><b>Qualification:</b> {job.qualification}</p>
           <p><b>Experience:</b> {job.experience}</p>
 
           <button

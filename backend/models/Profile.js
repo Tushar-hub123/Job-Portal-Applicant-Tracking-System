@@ -10,7 +10,7 @@ const profileSchema = new mongoose.Schema(
     },
     fullName: String,
     skills: [String],
-    education: String,
+    qualification: String,
     experience: String,
     phone: String
   },
