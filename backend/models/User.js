@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema({
 profile: {
   bio: String,
   skills: String
+},
+
+approved:{
+type:Boolean,
+default:false
 }
 }, { timestamps: true });
 

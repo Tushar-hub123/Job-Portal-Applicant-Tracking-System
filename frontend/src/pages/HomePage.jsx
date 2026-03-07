@@ -62,7 +62,6 @@ function HomePage() {
           <div style={footerSection}>
             <h4>Quick Links</h4>
             <ul style={footerLinks}>
-              <li><Link style={linkStyle} to="/">Home</Link></li>
               <li><Link style={linkStyle} to="/login">Login</Link></li>
               <li><Link style={linkStyle} to="/register">Sign Up</Link></li>
             </ul>

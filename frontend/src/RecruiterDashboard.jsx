@@ -72,6 +72,14 @@ function RecruiterDashboard() {
       fetchJobs();
 
     }catch(error){
+      alert("Your profile is not approved by admin");
+      setTitle("");
+      setCompany("");
+      setLocation("");
+      setDescription("");
+      setSkills("");
+      setQualification("");
+      setExperience("");
       console.log(error);
     }
   };

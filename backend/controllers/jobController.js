@@ -1,95 +1,138 @@
 const Job = require("../models/Job");
+const User = require("../models/User");
 
 
-// CREATE JOB
-exports.createJob = async (req,res)=>{
+// ================= CREATE JOB =================
 
-  try{
+exports.createJob = async (req, res) => {
+  try {
 
-    const {
-      title,
-      company,
-      location,
-      description,
-      skills,
-      qualification,
-      experience
-    } = req.body;
+    const recruiter = await User.findById(req.user.id);
+
+    if (!recruiter) {
+      return res.status(404).json({
+        message: "Recruiter not found"
+      });
+    }
+
+    // Check admin approval
+    if (!recruiter.approved) {
+      return res.status(403).json({
+        message: "Admin has not approved you yet"
+      });
+    }
 
     const job = await Job.create({
-
-      title,
-      company,
-      location,
-      description,
-      skills,
-      qualification,
-      experience,
-      recruiter:req.user.id
-
+      title: req.body.title,
+      company: req.body.company,
+      location: req.body.location,
+      description: req.body.description,
+      skills: req.body.skills,
+      qualification: req.body.qualification,
+      experience: req.body.experience,
+      recruiter: req.user.id
     });
 
     res.status(201).json(job);
 
-  }catch(error){
+  } catch (error) {
 
-    res.status(500).json({message:"Server Error"});
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server error"
+    });
 
   }
-
 };
 
 
-// GET MY JOBS
-exports.getMyJobs = async (req,res)=>{
 
-  try{
+// ================= GET MY JOBS =================
+
+exports.getMyJobs = async (req, res) => {
+
+  try {
 
     const jobs = await Job.find({
-      recruiter:req.user.id
+      recruiter: req.user.id
     });
 
     res.json(jobs);
 
-  }catch(error){
+  } catch (error) {
 
-    res.status(500).json({message:"Server Error"});
+    console.log(error);
 
-  }
-
-};
-
-
-// DELETE JOB
-exports.deleteJob = async (req,res)=>{
-
-  try{
-
-    await Job.findByIdAndDelete(req.params.id);
-
-    res.json({message:"Job Deleted"});
-
-  }catch(error){
-
-    res.status(500).json({message:"Server Error"});
+    res.status(500).json({
+      message: "Server Error"
+    });
 
   }
 
 };
 
 
-// GET ALL JOBS
-exports.getAllJobs = async (req,res)=>{
 
-  try{
+// ================= DELETE JOB =================
 
-    const jobs = await Job.find();
+exports.deleteJob = async (req, res) => {
+
+  try {
+
+    const job = await Job.findById(req.params.id);
+
+    if (!job) {
+      return res.status(404).json({
+        message: "Job not found"
+      });
+    }
+
+    // Only owner recruiter can delete
+    if (job.recruiter.toString() !== req.user.id) {
+      return res.status(403).json({
+        message: "Not authorized to delete this job"
+      });
+    }
+
+    await job.deleteOne();
+
+    res.json({
+      message: "Job Deleted Successfully"
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server Error"
+    });
+
+  }
+
+};
+
+
+
+// ================= GET ALL JOBS =================
+
+exports.getAllJobs = async (req, res) => {
+
+  try {
+
+    const jobs = await Job.find()
+      .populate("recruiter", "name email");
 
     res.json(jobs);
 
-  }catch(error){
+  } catch (error) {
 
-    res.status(500).json({message:"Server Error"});
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server Error"
+    });
 
   }
 
