@@ -151,6 +151,12 @@ function CandidateDashboard() {
 
                 <p><b>Location:</b> {job.location}</p>
 
+                <p><b>Skills Required:</b> {job.skills}</p>
+
+              <p><b>Qualification:</b> {job.qualification}</p>
+
+              <p><b>Experience:</b> {job.experience}</p>
+
                 {hasApplied(job._id) ? (
 
                   <button style={appliedBtn}>
