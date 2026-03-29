@@ -3,10 +3,12 @@ const Job = require("../models/Job");
 
 // Candidate Apply Job
 exports.applyJob = async (req, res) => {
-
   try {
-
     const { jobId } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "Resume required" });
+    }
 
     const existing = await Application.findOne({
       job: jobId,
@@ -29,6 +31,7 @@ exports.applyJob = async (req, res) => {
     });
 
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Server Error" });
   }
 };

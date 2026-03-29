@@ -33,6 +33,7 @@ exports.register = async (req, res) => {
     });
 
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -44,13 +45,16 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // ✅ 1️⃣ Check Admin from .env first
+    // ✅ ADMIN LOGIN
     if (
       email === process.env.ADMIN_EMAIL &&
       password === process.env.ADMIN_PASSWORD
     ) {
       const token = jwt.sign(
-        { role: "admin" },
+        {
+          id: "admin",      // ✅ FIXED (important)
+          role: "admin"
+        },
         process.env.JWT_SECRET,
         { expiresIn: "1d" }
       );
@@ -61,7 +65,7 @@ exports.login = async (req, res) => {
       });
     }
 
-    // ✅ 2️⃣ Normal User Login
+    // ✅ USER LOGIN
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -74,8 +78,12 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // ✅ TOKEN (contains role + id)
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      {
+        id: user._id,
+        role: user.role
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -86,6 +94,7 @@ exports.login = async (req, res) => {
     });
 
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Server error" });
   }
 };
