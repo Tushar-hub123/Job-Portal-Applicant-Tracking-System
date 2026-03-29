@@ -1,9 +1,5 @@
 const jwt = require("jsonwebtoken");
-const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-console.log("DECODED USER:", decoded);   // add this
-
-req.user = decoded;
 
 const protect = (req, res, next) => {
   const authHeader = req.headers.authorization;

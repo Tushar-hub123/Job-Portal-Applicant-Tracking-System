@@ -229,8 +229,6 @@ function CandidateDashboard() {
             </button>
           ))}
         </div>
-
-    
       </div>
 
       {/* Main */}
