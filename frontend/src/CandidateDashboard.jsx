@@ -22,14 +22,14 @@ function CandidateDashboard() {
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/jobs");
+      const res = await axios.get("https://job-portal-applicant-tracking-system.onrender.com/api/jobs");
       setJobs(res.data);
     } catch (err) { console.log(err); }
   };
 
   const fetchApplications = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/applications/my-applications", {
+      const res = await axios.get("https://job-portal-applicant-tracking-system.onrender.com/api/applications/my-applications", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setApplications(res.data);
@@ -52,7 +52,7 @@ function CandidateDashboard() {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/applications/apply",
+        "https://job-portal-applicant-tracking-system.onrender.com/api/applications/apply",
         formData,
         {
           headers: {

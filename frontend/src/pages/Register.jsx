@@ -56,7 +56,7 @@ function Register() {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/auth/register", form);
+      await axios.post("https://job-portal-applicant-tracking-system.onrender.com/api/auth/register", form);
       navigate("/login");
     } catch (error) {
       setErrors({ server: "Registration failed. Please try again." });
