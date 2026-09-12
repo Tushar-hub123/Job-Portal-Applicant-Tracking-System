@@ -4,6 +4,14 @@ A full-stack **Job Portal and Applicant Tracking System (ATS)** built using the 
 
 ---
 
+🌐 Live Deployment
+Frontend (Vercel)
+https:// job-portal-applicant-tracking-syste.vercel.app
+
+Backend API (Render)
+https://job-portal-applicant-tracking-system.onrender.com
+
+
 ## 🚀 Features
 
 ### 👨‍💻 Candidate
