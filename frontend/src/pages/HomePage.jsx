@@ -4,7 +4,7 @@
 // function HomePage() {
 //   return (
 //     <div style={{ fontFamily: "'Poppins', sans-serif", margin: 0, padding: 0 }}>
-      
+
 //       {/* Navbar */}
 //       <nav style={navStyle}>
 //         <h2 style={{ color: "#4f46e5", fontWeight: "700", fontSize: "28px" }}>JobPortal</h2>
@@ -77,7 +77,7 @@
 //             </div>
 //           </div>
 
-          
+
 
 //         </div>
 

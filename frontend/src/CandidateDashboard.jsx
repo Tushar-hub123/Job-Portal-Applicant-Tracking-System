@@ -36,39 +36,39 @@ function CandidateDashboard() {
     } catch (err) { console.log(err); }
   };
 
- const applyJob = async (jobId) => {
-  if (!resume) {
-    alert("Upload resume first");
-    return;
-  }
+  const applyJob = async (jobId) => {
+    if (!resume) {
+      alert("Upload resume first");
+      return;
+    }
 
-  const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-  const formData = new FormData();
-  formData.append("jobId", jobId);
-  formData.append("resume", resume);
+    const formData = new FormData();
+    formData.append("jobId", jobId);
+    formData.append("resume", resume);
 
-  setApplyingId(jobId);
+    setApplyingId(jobId);
 
-  try {
-    await axios.post(
-      "http://localhost:5000/api/applications/apply",
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
+    try {
+      await axios.post(
+        "http://localhost:5000/api/applications/apply",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      }
-    );
+      );
 
-    fetchApplications();
+      fetchApplications();
 
-  } catch (err) {
-    console.log(err);
-  } finally {
-    setApplyingId(null);
-  }
-};
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setApplyingId(null);
+    }
+  };
 
   const hasApplied = (jobId) => applications.some(app => app.job?._id === jobId);
 
@@ -240,7 +240,7 @@ function CandidateDashboard() {
           position: "sticky", top: 0, zIndex: 10,
           display: "flex", justifyContent: "space-between", alignItems: "center"
         }}>
-         
+
           {active === "jobs" && (
             <div style={{ position: "relative" }}>
               <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: "16px", opacity: 0.4 }}>🔍</span>

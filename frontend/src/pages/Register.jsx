@@ -309,10 +309,10 @@ function Register() {
         {/* Social proof */}
         <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
           <div style={{ display: "flex" }}>
-            {["A","B","C","D","E"].map((l, i) => (
+            {["A", "B", "C", "D", "E"].map((l, i) => (
               <div key={l} style={{
                 width: 34, height: 34, borderRadius: "50%",
-                background: `linear-gradient(135deg, hsl(${i*55+250},65%,60%), hsl(${i*55+275},65%,44%))`,
+                background: `linear-gradient(135deg, hsl(${i * 55 + 250},65%,60%), hsl(${i * 55 + 275},65%,44%))`,
                 border: "2px solid #0a0a0f",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: "12px", fontWeight: "700", color: "white",
@@ -426,7 +426,7 @@ function Register() {
             {form.password && (
               <div style={{ marginTop: "10px" }}>
                 <div style={{ display: "flex", gap: "4px", marginBottom: "7px" }}>
-                  {[1,2,3,4,5].map((s) => (
+                  {[1, 2, 3, 4, 5].map((s) => (
                     <div key={s} className="pw-bar" style={{
                       background: s <= pwStrength.score ? pwStrength.color : "rgba(255,255,255,0.07)"
                     }} />
@@ -452,9 +452,9 @@ function Register() {
           <div className="fu fu5" style={{ marginTop: "4px" }}>
             <button type="submit" className="submit-btn" disabled={loading}>
               {loading
-                ? <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"10px" }}>
-                    <span className="spinner" /> Creating account...
-                  </span>
+                ? <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
+                  <span className="spinner" /> Creating account...
+                </span>
                 : "Create my account →"
               }
             </button>

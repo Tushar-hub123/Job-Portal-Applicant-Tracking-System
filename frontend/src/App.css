@@ -9,7 +9,8 @@ body {
   padding: 10px;
 }
 
-.nav a, .nav button {
+.nav a,
+.nav button {
   color: white;
   margin-right: 15px;
   text-decoration: none;
@@ -22,7 +23,9 @@ body {
   flex-direction: column;
 }
 
-.form input, .form textarea, .form select {
+.form input,
+.form textarea,
+.form select {
   margin: 5px 0;
   padding: 8px;
 }
