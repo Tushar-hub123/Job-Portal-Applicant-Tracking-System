@@ -5,7 +5,7 @@ async function loadApplications() {
 const jobId = "JOB_ID_HERE";
 
 const res = await fetch(
-"http://localhost:5000/api/applications/job/" + jobId,
+"https://job-portal-applicant-tracking-system.onrender.com/api/applications/job/" + jobId,
 {
 headers: {
 Authorization: "Bearer " + token

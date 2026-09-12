@@ -24,7 +24,7 @@ document.getElementById("coverLetter").value
 const token = localStorage.getItem("token");
 
 const res = await fetch(
-"http://localhost:5000/api/applications/apply",
+"https://job-portal-applicant-tracking-system.onrender.com/api/applications/apply",
 {
 method: "POST",
 headers: {

@@ -11,7 +11,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "https://job-portal-applicant-tracking-syste.vercel.app/",
   credentials: true
 }));
 
