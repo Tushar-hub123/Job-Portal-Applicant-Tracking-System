@@ -626,8 +626,12 @@ function Chatbot() {
   const requestVersionRef = useRef(0);
 
   // Hide chatbot on login and register pages
-  const hiddenRoutes = ["/login", "/register"];
-  const shouldHide = hiddenRoutes.includes(location.pathname);
+ // Hide chatbot on home, login, and register pages
+const hiddenRoutes = ["/", "/login", "/register"];
+
+const shouldHide = hiddenRoutes.includes(
+  location.pathname.replace(/\/+$/, "") || "/"
+);
 
   // Get Authorization headers for a specific account.
   const getAuthConfig = (currentToken) => ({
@@ -1215,7 +1219,9 @@ function Chatbot() {
       )}
 
     </div>
+    
   );
+  
 }
 
 export default Chatbot;
