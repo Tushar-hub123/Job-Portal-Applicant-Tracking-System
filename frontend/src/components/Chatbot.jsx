@@ -1,6 +1,10 @@
 
+
+
+
+
 import { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import {
   FiMessageCircle,
@@ -15,10 +19,7 @@ import {
 import CHAT_API from "../api/chatAxios";
 import "./Chatbot.css";
 
-// ============================================
-// DEFAULT GREETING
-// ============================================
-
+// Default greeting for logged-in users
 const initialMessage = {
   role: "assistant",
   text: `Hello! 👋 Welcome to CareerFlow AI.
@@ -28,27 +29,27 @@ I'm your personal career assistant. I can help you with resume improvement, inte
 How can I help you today?`
 };
 
+// Exact welcome message for guests
+const guestMessage =
+  "Welcome to CareerFlow AI! I can help you with resume analysis, job opportunities, interview preparation, and career guidance. Please log in to start chatting.";
+
 function Chatbot() {
   const location = useLocation();
+  const navigate = useNavigate();
 
-  // ============================================
-  // AUTHENTICATION
-  // ============================================
-
+  // Authentication state
   const [token, setToken] = useState(
     () => localStorage.getItem("token")
   );
 
-  const isLoggedIn = !!token;
+  const isGuest = !token;
 
-  // ============================================
-  // CHATBOT STATES
-  // ============================================
-
+  // Chatbot UI states
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Conversation states
   const [messages, setMessages] = useState([initialMessage]);
   const [chats, setChats] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
@@ -56,42 +57,25 @@ function Chatbot() {
 
   const messagesEndRef = useRef(null);
 
-  // Prevent old API responses from updating another account.
+  // Prevent old requests from updating a newly logged-in account.
   const requestVersionRef = useRef(0);
 
-  // ============================================
-  // ROUTE-BASED CHATBOT VISIBILITY
-  // ============================================
+  // Hide chatbot on login and register pages
+  const hiddenRoutes = ["/login", "/register"];
+  const shouldHide = hiddenRoutes.includes(location.pathname);
 
-  const currentPath =
-    location.pathname.replace(/\/+$/, "") || "/";
-
-  const dashboardRoutes = [
-    "/candidate-dashboard",
-    "/recruiter-dashboard",
-    "/admin-dashboard"
-  ];
-
-  const shouldShowChatbot =
-    dashboardRoutes.includes(currentPath) && isLoggedIn;
-
-  // ============================================
-  // API AUTHORIZATION
-  // ============================================
-
+  // Get Authorization headers for a specific account.
   const getAuthConfig = (currentToken) => ({
     headers: {
       Authorization: `Bearer ${currentToken}`
     }
   });
 
-  // ============================================
-  // SYNCHRONIZE LOGIN / LOGOUT
-  // ============================================
-
+  // Synchronize authentication with localStorage
   useEffect(() => {
     const updateAuth = () => {
-      setToken(localStorage.getItem("token"));
+      const currentToken = localStorage.getItem("token");
+      setToken(currentToken);
     };
 
     window.addEventListener("authChanged", updateAuth);
@@ -103,38 +87,29 @@ function Chatbot() {
       window.removeEventListener("authChanged", updateAuth);
       window.removeEventListener("storage", updateAuth);
     };
-  }, []);
+  }, [location.pathname]);
 
-  // ============================================
-  // RESET CHAT WHEN ACCOUNT CHANGES
-  // ============================================
-
+  // Reset chatbot whenever the authenticated account changes.
   useEffect(() => {
     requestVersionRef.current += 1;
 
-    setIsOpen(false);
     setChats([]);
     setActiveChatId(null);
     setMessages([initialMessage]);
     setMessage("");
     setShowHistory(false);
     setLoading(false);
+
   }, [token]);
 
-  // ============================================
-  // SCROLL TO LATEST MESSAGE
-  // ============================================
-
+  // Scroll to the latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth"
     });
   }, [messages, loading]);
 
-  // ============================================
-  // HANDLE INVALID / EXPIRED TOKEN
-  // ============================================
-
+  // Handle expired or invalid authentication
   const handleUnauthorized = (currentToken) => {
     if (localStorage.getItem("token") !== currentToken) {
       return;
@@ -142,22 +117,17 @@ function Chatbot() {
 
     localStorage.removeItem("token");
     localStorage.removeItem("role");
-    localStorage.removeItem("user");
 
     window.dispatchEvent(new Event("authChanged"));
   };
 
-  // ============================================
-  // LOAD SAVED CHAT HISTORY
-  // ============================================
-
+  // Load saved conversations for the current user
   useEffect(() => {
-    if (!isOpen || !isLoggedIn || !token) return;
+    if (!isOpen || !token) return;
 
     let cancelled = false;
-
-    const currentToken = token;
     const currentVersion = requestVersionRef.current;
+    const currentToken = token;
 
     const loadChats = async () => {
       try {
@@ -177,6 +147,7 @@ function Chatbot() {
         if (response.data.success) {
           setChats(response.data.chats || []);
         }
+
       } catch (error) {
         if (cancelled) return;
 
@@ -193,14 +164,12 @@ function Chatbot() {
     return () => {
       cancelled = true;
     };
-  }, [isOpen, isLoggedIn, token]);
 
-  // ============================================
-  // START NEW CONVERSATION
-  // ============================================
+  }, [isOpen, token, location.pathname]);
 
+  // Start a new conversation
   const newChat = () => {
-    if (loading || !isLoggedIn || !token) return;
+    if (loading || isGuest) return;
 
     setActiveChatId(null);
     setMessages([initialMessage]);
@@ -208,12 +177,9 @@ function Chatbot() {
     setShowHistory(false);
   };
 
-  // ============================================
-  // OPEN EXISTING CONVERSATION
-  // ============================================
-
+  // Open an existing conversation
   const openChat = async (chatId) => {
-    if (loading || !isLoggedIn || !token) return;
+    if (loading || isGuest || !token) return;
 
     const currentToken = token;
     const currentVersion = requestVersionRef.current;
@@ -245,6 +211,7 @@ function Chatbot() {
 
         setShowHistory(false);
       }
+
     } catch (error) {
       console.error("Unable to open conversation:", error);
 
@@ -260,21 +227,18 @@ function Chatbot() {
     }
   };
 
-  // ============================================
-  // DELETE CONVERSATION
-  // ============================================
-
+  // Delete an existing conversation
   const deleteChat = async (chatId) => {
-    if (loading || !isLoggedIn || !token) return;
+    if (loading || isGuest || !token) return;
+
+    const currentToken = token;
+    const currentVersion = requestVersionRef.current;
 
     const confirmed = window.confirm(
       "Are you sure you want to delete this conversation?"
     );
 
     if (!confirmed) return;
-
-    const currentToken = token;
-    const currentVersion = requestVersionRef.current;
 
     try {
       await CHAT_API.delete(
@@ -297,6 +261,7 @@ function Chatbot() {
         setActiveChatId(null);
         setMessages([initialMessage]);
       }
+
     } catch (error) {
       console.error("Delete conversation error:", error);
 
@@ -312,21 +277,14 @@ function Chatbot() {
     }
   };
 
-  // ============================================
-  // SEND MESSAGE TO GEMINI AI
-  // ============================================
-
+  // Send message to Gemini AI
   const sendMessage = async (e) => {
     e?.preventDefault();
 
+    // Verify current authentication
     const currentToken = localStorage.getItem("token");
 
-    if (!currentToken) {
-      setToken(null);
-      return;
-    }
-
-    if (currentToken !== token) {
+    if (!currentToken || currentToken !== token) {
       setToken(currentToken);
       return;
     }
@@ -359,6 +317,7 @@ function Chatbot() {
         getAuthConfig(currentToken)
       );
 
+      // Ignore responses belonging to a previous account.
       if (
         currentVersion !== requestVersionRef.current ||
         localStorage.getItem("token") !== currentToken
@@ -383,30 +342,20 @@ function Chatbot() {
         }
       ]);
 
-      // Refresh chat history.
-      try {
-        const historyResponse = await CHAT_API.get(
-          "/chats",
-          getAuthConfig(currentToken)
-        );
+      // Refresh this user's conversation history.
+      const historyResponse = await CHAT_API.get(
+        "/chats",
+        getAuthConfig(currentToken)
+      );
 
-        if (
-          currentVersion === requestVersionRef.current &&
-          localStorage.getItem("token") === currentToken &&
-          historyResponse.data.success
-        ) {
-          setChats(historyResponse.data.chats || []);
-        }
-      } catch (historyError) {
-        console.error(
-          "Unable to refresh chat history:",
-          historyError
-        );
-
-        if (historyError.response?.status === 401) {
-          handleUnauthorized(currentToken);
-        }
+      if (
+        currentVersion === requestVersionRef.current &&
+        localStorage.getItem("token") === currentToken &&
+        historyResponse.data.success
+      ) {
+        setChats(historyResponse.data.chats || []);
       }
+
     } catch (error) {
       console.error("Chatbot Error:", error);
 
@@ -435,6 +384,7 @@ function Chatbot() {
           isError: true
         }
       ]);
+
     } finally {
       if (currentVersion === requestVersionRef.current) {
         setLoading(false);
@@ -442,11 +392,7 @@ function Chatbot() {
     }
   };
 
-  // ============================================
-  // ENTER TO SEND MESSAGE
-  // SHIFT + ENTER FOR NEW LINE
-  // ============================================
-
+  // Enter to send; Shift + Enter for a new line
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -454,23 +400,13 @@ function Chatbot() {
     }
   };
 
-  // ============================================
-  // HIDE CHATBOT OUTSIDE AUTHENTICATED DASHBOARDS
-  // ============================================
-
-  if (!shouldShowChatbot) {
-    return null;
-  }
-
-  // ============================================
-  // CHATBOT UI
-  // ============================================
+  // Hide chatbot on Login and Register pages
+  if (shouldHide) return null;
 
   return (
     <div className="career-chatbot">
 
-      {/* FLOATING CHATBOT ICON */}
-
+      {/* Floating chatbot icon */}
       {!isOpen && (
         <button
           className="chatbot-toggle"
@@ -486,8 +422,7 @@ function Chatbot() {
       {isOpen && (
         <div className="chatbot-window">
 
-          {/* HEADER */}
-
+          {/* Header */}
           <div className="chatbot-header">
 
             <div className="chatbot-brand">
@@ -505,25 +440,29 @@ function Chatbot() {
 
             <div className="chatbot-actions">
 
-              <button
-                onClick={newChat}
-                disabled={loading}
-                title="New conversation"
-                aria-label="New conversation"
-              >
-                <FiPlus />
-              </button>
+              {!isGuest && (
+                <>
+                  <button
+                    onClick={newChat}
+                    disabled={loading}
+                    title="New conversation"
+                    aria-label="New conversation"
+                  >
+                    <FiPlus />
+                  </button>
 
-              <button
-                onClick={() =>
-                  setShowHistory((previous) => !previous)
-                }
-                disabled={loading}
-                title="Chat history"
-                aria-label="Chat history"
-              >
-                <FiClock />
-              </button>
+                  <button
+                    onClick={() =>
+                      setShowHistory((previous) => !previous)
+                    }
+                    disabled={loading}
+                    title="Chat history"
+                    aria-label="Chat history"
+                  >
+                    <FiClock />
+                  </button>
+                </>
+              )}
 
               <button
                 onClick={() => setIsOpen(false)}
@@ -544,9 +483,8 @@ function Chatbot() {
             </div>
           </div>
 
-          {/* CHAT HISTORY */}
-
-          {showHistory && (
+          {/* Chat history: logged-in users only */}
+          {!isGuest && showHistory && (
             <div className="chat-history-panel">
 
               <div className="chat-history-heading">
@@ -596,42 +534,53 @@ function Chatbot() {
             </div>
           )}
 
-          {/* MESSAGES */}
-
+          {/* Messages */}
           <div className="chatbot-messages">
 
             <div className="chatbot-date">
               CareerFlow AI Assistant
             </div>
 
-            {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`chat-message ${
-                  msg.role === "user"
-                    ? "user-message"
-                    : "ai-message"
-                }`}
-              >
+            {isGuest ? (
 
-                {msg.role === "assistant" && (
-                  <div className="message-avatar">✨</div>
-                )}
+              <div className="chat-message ai-message">
+                <div className="message-avatar">✨</div>
 
+                <div className="message-content">
+                  {guestMessage}
+                </div>
+              </div>
+
+            ) : (
+
+              messages.map((msg, index) => (
                 <div
-                  className={`message-content ${
-                    msg.isError ? "error-message" : ""
+                  key={index}
+                  className={`chat-message ${
+                    msg.role === "user"
+                      ? "user-message"
+                      : "ai-message"
                   }`}
                 >
-                  {msg.text}
+
+                  {msg.role === "assistant" && (
+                    <div className="message-avatar">✨</div>
+                  )}
+
+                  <div
+                    className={`message-content ${
+                      msg.isError ? "error-message" : ""
+                    }`}
+                  >
+                    {msg.text}
+                  </div>
+
                 </div>
+              ))
+            )}
 
-              </div>
-            ))}
-
-            {/* TYPING INDICATOR */}
-
-            {loading && (
+            {/* Typing indicator */}
+            {!isGuest && loading && (
               <div className="chat-message ai-message">
                 <div className="message-avatar">✨</div>
 
@@ -647,33 +596,52 @@ function Chatbot() {
 
           </div>
 
-          {/* MESSAGE INPUT */}
+          {/* Guest login button */}
+          {isGuest ? (
 
-          <form
-            className="chatbot-input-area"
-            onSubmit={sendMessage}
-          >
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Ask me anything about your career..."
-              rows="1"
-              maxLength={4000}
-              disabled={loading}
-            />
+            <div className="guest-login-panel">
+              <p>
+                Please log in to start chatting with CareerFlow AI.
+              </p>
 
-            <button
-              type="submit"
-              disabled={!message.trim() || loading}
-              aria-label="Send message"
+              <button
+                className="guest-login-button"
+                onClick={() => {
+                  setIsOpen(false);
+                  navigate("/login");
+                }}
+              >
+                Log in to start chatting
+              </button>
+            </div>
+
+          ) : (
+
+            <form
+              className="chatbot-input-area"
+              onSubmit={sendMessage}
             >
-              <FiSend />
-            </button>
-          </form>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Ask me anything about your career..."
+                rows="1"
+                maxLength={4000}
+                disabled={loading}
+              />
 
-          {/* FOOTER */}
+              <button
+                type="submit"
+                disabled={!message.trim() || loading}
+                aria-label="Send message"
+              >
+                <FiSend />
+              </button>
+            </form>
+          )}
 
+          {/* Footer */}
           <div className="chatbot-footer">
             Powered by Gemini AI · CareerFlow
           </div>
