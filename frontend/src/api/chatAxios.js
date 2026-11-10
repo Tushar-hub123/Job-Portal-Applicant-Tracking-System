@@ -2,9 +2,7 @@
 import axios from "axios";
 
 const CHAT_API = axios.create({
-  baseURL:
-    import.meta.env.VITE_CHAT_API_URL ||
-    "http://localhost:5000/api"
+  baseURL: "https://job-portal-applicant-tracking-system.onrender.com/api"
 });
 
 CHAT_API.interceptors.request.use(
