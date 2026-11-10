@@ -10,8 +10,16 @@ const app = express();
 connectDB();
 
 // Middleware
+// app.use(cors({
+//   origin: "https://job-portal-applicant-tracking-syste.vercel.app",
+//   credentials: true
+// }));
+
 app.use(cors({
-  origin: "https://job-portal-applicant-tracking-syste.vercel.app",
+  origin: [
+    "http://localhost:5173",
+    "https://job-portal-applicant-tracking-syste.vercel.app"
+  ],
   credentials: true
 }));
 
@@ -28,6 +36,8 @@ app.use("/api/jobs", require("./routes/jobRoutes"));
 app.use("/api/applications", require("./routes/applicationRoutes"));
 app.use("/api/profile", require("./routes/profileRoutes"));
 app.use("/api/admin",adminRoutes);
+app.use("/api/chat", require("./routes/chatRoutes"));  // for chatbot
+app.use("/api/chats", require("./routes/chatHistoryRoutes"));
 
 // Server
 const PORT = process.env.PORT || 5000;

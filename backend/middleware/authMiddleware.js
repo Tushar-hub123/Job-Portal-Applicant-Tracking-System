@@ -1,12 +1,14 @@
-const jwt = require("jsonwebtoken");
 
+const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
 const protect = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  // Check header exists and starts with Bearer
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Not authorized" });
+    return res.status(401).json({
+      message: "Not authorized. Please log in."
+    });
   }
 
   try {
@@ -14,10 +16,27 @@ const protect = (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = decoded; // contains id and role
+    // Ensure the token contains a valid MongoDB user ID.
+    if (
+      !decoded.id ||
+      !mongoose.Types.ObjectId.isValid(decoded.id)
+    ) {
+      return res.status(401).json({
+        message: "Invalid user ID in token. Please log in again."
+      });
+    }
+
+    req.user = {
+      id: decoded.id,
+      role: decoded.role
+    };
+
     next();
+
   } catch (error) {
-    return res.status(401).json({ message: "Invalid token" });
+    return res.status(401).json({
+      message: "Invalid or expired token. Please log in again."
+    });
   }
 };
 
